@@ -1,6 +1,7 @@
 """CLI for AppImage installer."""
 
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -25,16 +26,15 @@ Categories=Utility;
 
 
 def get_app_name(appimage_path: Path) -> str:
-    """Extract application name from AppImage filename."""
+    """Extract application name from AppImage filename.
+
+    Cuts at the first '-' or '+' followed by a digit, where the version
+    string typically begins.
+    """
     name = appimage_path.stem
-    # Remove version-like suffixes (e.g., -x86_64, -1.2.3)
-    for sep in ["-x86_64", "-x86", "-aarch64", "-arm64", "-linux"]:
-        if sep in name.lower():
-            name = name[: name.lower().index(sep)]
-    # Remove trailing version numbers
-    parts = name.rsplit("-", 1)
-    if len(parts) == 2 and parts[1] and parts[1][0].isdigit():
-        name = parts[0]
+    match = re.search(r"[-+]\d", name)
+    if match:
+        name = name[: match.start()]
     return name
 
 
