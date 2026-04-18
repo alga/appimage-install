@@ -38,8 +38,14 @@ def get_app_name(appimage_path: Path) -> str:
     return name
 
 
+def make_executable(path: Path) -> None:
+    """Add executable bit for user, group, and other."""
+    path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+
 def extract_appimage(appimage_path: Path, extract_dir: Path) -> Path:
     """Extract AppImage contents to a directory."""
+    make_executable(appimage_path)
     subprocess.run(
         [str(appimage_path), "--appimage-extract"],
         cwd=extract_dir,
@@ -148,9 +154,7 @@ def install(appimage: Path, name: str | None):
     # Copy AppImage to bin directory
     dest_appimage = BIN_DIR / f"{app_name_lower}.appimage"
     shutil.copy2(appimage, dest_appimage)
-    dest_appimage.chmod(
-        dest_appimage.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
-    )
+    make_executable(dest_appimage)
     click.echo(f"  AppImage: {dest_appimage}")
 
     # Create symlink
