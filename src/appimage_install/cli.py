@@ -148,7 +148,9 @@ def install(appimage: Path, name: str | None):
     # Copy AppImage to bin directory
     dest_appimage = BIN_DIR / f"{app_name_lower}.appimage"
     shutil.copy2(appimage, dest_appimage)
-    dest_appimage.chmod(dest_appimage.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    dest_appimage.chmod(
+        dest_appimage.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+    )
     click.echo(f"  AppImage: {dest_appimage}")
 
     # Create symlink
